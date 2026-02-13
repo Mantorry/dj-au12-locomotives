@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+  <div>
+    <h3 class="section-title mb-1">Работники</h3>
+    <div class="text-muted">Список пользователей</div>
+  </div>
+</div>
+
+<div class="card p-3 mb-3">
+  <form class="row g-2 align-items-end" method="get">
+    <div class="col-md-3">
+      <label class="form-label">{{ filter_form.role.label }}</label>
+      {{ filter_form.role }}
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">{{ filter_form.q.label }}</label>
+      {{ filter_form.q }}
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button class="btn btn-brand w-100" type="submit">Фильтр</button>
+      <a class="btn btn-ghost w-100" href="{% url 'accounts:worker_list' %}">Сброс</a>
+    </div>
+  </form>
+</div>
+
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table table-sm align-middle mb-0">
+      <thead>
+        <tr>
+          <th>ФИО</th>
+          <th>Логин</th>
+          <th>Должность</th>
+          <th>Станция</th>
+          <th>Активен</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for u in object_list %}
+        <tr>
+          <td class="fw-semibold">{{ u.last_name }} {{ u.first_name }} {{ u.patronymic }}</td>
+          <td class="text-muted">{{ u.username }}</td>
+          <td>{{ u.get_role_display }}</td>
+          <td>{% if u.station %}{{ u.station }}{% else %}—{% endif %}</td>
+          <td>{% if u.is_active %}Да{% else %}Нет{% endif %}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="text-muted">Нет данных</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+  <div>
+    <h3 class="section-title mb-1">Бригады</h3>
+    <div class="text-muted">Привязка бригад к ССПС и составу</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-brand" href="{% url 'panel:brigade_create' %}">Добавить</a>
+    <a class="btn btn-ghost" href="{% url 'panel:home' %}">Панель</a>
+  </div>
+</div>
+
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table table-sm align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Название</th>
+          <th>ССПС</th>
+          <th>Состав</th>
+          <th>Активна</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for obj in object_list %}
+        <tr>
+          <td class="fw-semibold">{{ obj.name }}</td>
+          <td>{{ obj.ssps_unit }}</td>
+          <td class="text-muted">
+            {% for m in obj.members.all %}
+              {{ m.last_name }} {{ m.first_name }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              —
+            {% endfor %}
+          </td>
+          <td>{% if obj.is_active %}Да{% else %}Нет{% endif %}</td>
+          <td class="text-end">
+            <a class="btn btn-ghost btn-sm" href="{% url 'panel:brigade_edit' obj.id %}">Редактировать</a>
+            <a class="btn btn-ghost btn-sm" href="{% url 'panel:brigade_delete' obj.id %}">Удалить</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="text-muted">Нет данных</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+  <div>
+    <h3 class="section-title mb-1">Раздел I — Бригада</h3>
+    <div class="text-muted">АУ-12 №{{ rs.number }} от {{ rs.date }}</div>
+  </div>
+  <a class="btn btn-ghost" href="{% url 'routesheets:au12_detail' rs.id %}">Назад</a>
+</div>
+
+<div class="card p-4">
+  <form method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>Должность (выбор)</th>
+            <th>Должность (вручную)</th>
+            <th>ФИО</th>
+            <th>Явка</th>
+            <th>Оконч.</th>
+            <th>Перер.</th>
+            <th>Отдых</th>
+            <th>Удалить</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for f in formset.forms %}
+          <tr>
+            <td>{{ f.position_ref }}</td>
+            <td>{{ f.position_text }}</td>
+            <td>{{ f.full_name }}</td>
+            <td>{{ f.time_check_in }}</td>
+            <td>{{ f.time_check_out }}</td>
+            <td>{{ f.overtime_minutes }}</td>
+            <td>{{ f.rest_minutes }}</td>
+            <td>{% if f.instance.pk %}{{ f.DELETE }}{% endif %}</td>
+          </tr>
+          {% if f.non_field_errors %}
+            <tr><td colspan="8" class="text-danger small">{{ f.non_field_errors }}</td></tr>
+          {% endif %}
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <button class="btn btn-brand" type="submit">Сохранить</button>
+  </form>
+</div>
+{% endblock %}

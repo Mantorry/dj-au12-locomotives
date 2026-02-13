@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+  <div>
+    <h3 class="section-title mb-1">Аналитика — расход топлива</h3>
+    <div class="text-muted">Литры, пробег, л/100км</div>
+  </div>
+</div>
+
+<div class="card p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label">Дата с</label>
+      <input class="form-control" type="date" name="date_from" value="{{ filters.date_from }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Дата по</label>
+      <input class="form-control" type="date" name="date_to" value="{{ filters.date_to }}">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">ССПС</label>
+      <select class="form-select" name="ssps">
+        <option value="">— все —</option>
+        {% for u in ssps_list %}
+          <option value="{{ u.id }}" {% if filters.ssps == u.id|stringformat:"s" %}selected{% endif %}>{{ u }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button class="btn btn-brand w-100" type="submit">Показать</button>
+      <a class="btn btn-ghost w-100" href="{% url 'routesheets:analytics_fuel' %}">Сброс</a>
+    </div>
+  </form>
+</div>
+
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table table-sm align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>№</th>
+          <th>ССПС</th>
+          <th>Пробег (км)</th>
+          <th>Расход (л)</th>
+          <th>л/100км</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td>{{ r.date }}</td>
+          <td class="fw-semibold">{{ r.number }}</td>
+          <td>{{ r.ssps }}</td>
+          <td>{{ r.km }}</td>
+          <td>{{ r.fuel|floatformat:2 }}</td>
+          <td>{{ r.l_100|floatformat:2 }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="text-muted">Нет данных</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

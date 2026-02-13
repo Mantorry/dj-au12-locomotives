@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <h3 class="section-title mb-1">Медосмотр (до работы)</h3>
+        <div class="text-muted">АУ-12 №{{ rs.number }} от {{ rs.date }}</div>
+      </div>
+      <span class="badge-soft">{{ rs.ssps_unit }}</span>
+    </div>
+
+    <div class="card p-4">
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label">{{ field.label }}</label>
+            {% if field.field.widget.input_type == "checkbox" %}
+              <div class="form-check">{{ field }} <label class="form-check-label">Да</label></div>
+            {% else %}
+              {{ field }}
+            {% endif %}
+            {% for e in field.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <div class="d-flex gap-2">
+          <button class="btn btn-brand" type="submit">Сохранить</button>
+          <a class="btn btn-ghost" href="{% url 'routesheets:au12_detail' rs.id %}">Назад</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+  <div>
+    <h3 class="section-title mb-1">Маршрутные листы АУ-12</h3>
+    <div class="text-muted">Создание, заполнение, экспорт</div>
+  </div>
+  <a class="btn btn-brand" href="{% url 'routesheets:au12_create' %}">Создать</a>
+</div>
+
+<div class="card p-3 mb-3">
+  <form class="row g-2 align-items-end" method="get">
+    <div class="col-md-9">
+      <label class="form-label">Поиск</label>
+      <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="№ листа / ССПС / бригада">
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button class="btn btn-brand w-100" type="submit">Найти</button>
+      <a class="btn btn-ghost w-100" href="{% url 'routesheets:au12_list' %}">Сброс</a>
+    </div>
+  </form>
+</div>
+
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table table-sm align-middle mb-0">
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Дата</th>
+          <th>ССПС</th>
+          <th>Бригада</th>
+          <th>Статус</th>
+          <th>Этап</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for rs in object_list %}
+        <tr>
+          <td class="fw-semibold">{{ rs.number }}</td>
+          <td>{{ rs.date }}</td>
+          <td>{{ rs.ssps_unit }}</td>
+          <td>{% if rs.brigade %}{{ rs.brigade.name }}{% else %}—{% endif %}</td>
+          <td><span class="badge-soft">{{ rs.get_status_display }}</span></td>
+          <td>{{ rs.get_step_display }}</td>
+          <td class="text-end">
+            <a class="btn btn-ghost btn-sm" href="{% url 'routesheets:au12_detail' rs.id %}">Открыть</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" class="text-muted">Нет данных</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

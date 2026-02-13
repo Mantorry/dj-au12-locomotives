@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+  <div>
+    <h3 class="section-title mb-1">Пользователи</h3>
+    <div class="text-muted">Редактирование учётных записей</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-brand" href="{% url 'accounts:register' %}">Добавить</a>
+    <a class="btn btn-ghost" href="{% url 'panel:home' %}">Панель</a>
+  </div>
+</div>
+
+<div class="card p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-9">
+      <label class="form-label">Поиск</label>
+      <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="логин / фамилия / имя">
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button class="btn btn-brand w-100" type="submit">Найти</button>
+      <a class="btn btn-ghost w-100" href="{% url 'panel:user_list' %}">Сброс</a>
+    </div>
+  </form>
+</div>
+
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table table-sm align-middle mb-0">
+      <thead>
+        <tr>
+          <th>ФИО</th>
+          <th>Логин</th>
+          <th>Должность</th>
+          <th>Станция</th>
+          <th>Активен</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for u in object_list %}
+        <tr>
+          <td class="fw-semibold">{{ u.last_name }} {{ u.first_name }} {{ u.patronymic }}</td>
+          <td class="text-muted">{{ u.username }}</td>
+          <td>{{ u.get_role_display }}</td>
+          <td>{% if u.station %}{{ u.station }}{% else %}—{% endif %}</td>
+          <td>{% if u.is_active %}Да{% else %}Нет{% endif %}</td>
+          <td class="text-end">
+            <a class="btn btn-ghost btn-sm" href="{% url 'panel:user_edit' u.id %}">Редактировать</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="text-muted">Нет данных</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

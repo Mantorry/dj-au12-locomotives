@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+  <div>
+    <h3 class="section-title mb-1">Панель управления</h3>
+    <div class="text-muted">Справочники и пользователи</div>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-3">
+    <div class="card p-3">
+      <div class="text-muted">Пользователи</div>
+      <div class="fs-3 fw-bold">{{ cnt_users }}</div>
+      <a class="btn btn-ghost mt-2" href="{% url 'panel:user_list' %}">Открыть</a>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <div class="text-muted">ССПС</div>
+      <div class="fs-3 fw-bold">{{ cnt_units }}</div>
+      <a class="btn btn-ghost mt-2" href="{% url 'panel:ssps_list' %}">Открыть</a>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <div class="text-muted">Маршрутные листы</div>
+      <div class="fs-3 fw-bold">{{ cnt_rs }}</div>
+      <a class="btn btn-ghost mt-2" href="{% url 'routesheets:au12_list' %}">Открыть</a>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <div class="text-muted">Бригады</div>
+      <div class="fs-3 fw-bold">{{ cnt_brigades }}</div>
+      <a class="btn btn-ghost mt-2" href="{% url 'panel:brigade_list' %}">Открыть</a>
+    </div>
+  </div>
+</div>
+
+<div class="card p-4">
+  <h5 class="mb-3">Справочники</h5>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-ghost" href="{% url 'panel:enterprise_list' %}">Предприятия</a>
+    <a class="btn btn-ghost" href="{% url 'panel:station_list' %}">Станции</a>
+    <a class="btn btn-ghost" href="{% url 'panel:fuel_list' %}">Топливо</a>
+    <a class="btn btn-ghost" href="{% url 'panel:lube_list' %}">Смазки</a>
+    <a class="btn btn-ghost" href="{% url 'panel:ssps_list' %}">ССПС</a>
+    <a class="btn btn-ghost" href="{% url 'panel:brigade_list' %}">Бригады</a>
+  </div>
+</div>
+{% endblock %}

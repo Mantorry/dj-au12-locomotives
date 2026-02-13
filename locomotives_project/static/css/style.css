@@ -1,0 +1,36 @@
+:root{
+  --brand:#b30012;
+  --brand2:#7a000c;
+}
+
+.section-title{ font-weight:700; }
+.btn-brand{
+  background:var(--brand);
+  border-color:var(--brand);
+  color:#fff;
+}
+.btn-brand:hover{ background:var(--brand2); border-color:var(--brand2); color:#fff; }
+
+.btn-ghost{
+  border:1px solid rgba(179,0,18,.25);
+  color:var(--brand);
+  background:#fff;
+}
+.btn-ghost:hover{
+  border-color:rgba(179,0,18,.4);
+  color:var(--brand2);
+}
+
+.card{
+  border:1px solid rgba(179,0,18,.15);
+  border-radius:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,.04);
+}
+.badge-soft{
+  display:inline-block;
+  padding:.4rem .7rem;
+  border-radius:999px;
+  background:rgba(179,0,18,.08);
+  color:var(--brand);
+  border:1px solid rgba(179,0,18,.18);
+}
