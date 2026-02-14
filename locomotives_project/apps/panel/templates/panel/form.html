@@ -18,7 +18,24 @@
         {% for field in form %}
           <div class="mb-3">
             <label class="form-label">{{ field.label }}</label>
-            {% if field.field.widget.input_type == "checkbox" %}
+            {% if field.name == "members" %}
+							<div class="d-none">{{ field }}</div>
+							<div class="row g-2 align-items-center" data-members-picker>
+								<div class="col-md-5">
+									<div class="small text-muted mb-1">Доступные пользователи</div>
+									<select class="form-select" data-members-available size="12" multiple></select>
+								</div>
+								<div class="col-md-2 d-flex flex-md-column justify-content-center gap-2">
+									<button class="btn btn-ghost btn-sm" type="button" data-members-add>&gt;&gt;</button>
+									<button class="btn btn-ghost btn-sm" type="button" data-members-remove>&lt;&lt;</button>
+								</div>
+								<div class="col-md-5">
+									<div class="small text-muted mb-1">Состав бригады</div>
+									<select class="form-select" data-members-selected size="12" multiple></select>
+								</div>
+							</div>
+							{% if field.help_text %} <div class="form-text">{{ field.help_text }}</div>{% endif %}
+						{% elif field.field.widget.input_type == 'checkbox' %}
               <div class="form-check">
                 {{ field }} <label class="form-check-label">Да</label>
               </div>
@@ -33,4 +50,47 @@
     </div>
   </div>
 </div>
+<script>
+  (function () {
+    const membersRoot = document.querySelector('[data-members-picker]');
+    if (!membersRoot) return;
+
+    const source = document.getElementById('id_members');
+    if (!source) return;
+    const available = membersRoot.querySelector('[data-members-available]');
+    const selected = membersRoot.querySelector('[data-members-selected]');
+    const addBtn = membersRoot.querySelector('[data-members-add]');
+    const removeBtn = membersRoot.querySelector('[data-members-remove]');
+
+    const createOption = (opt) => {
+      const o = document.createElement('option');
+      o.value = opt.value;
+      o.textContent = opt.textContent;
+      return o;
+    };
+
+    for (const opt of source.options) {
+      const target = opt.selected ? selected : available;
+      target.appendChild(createOption(opt));
+    }
+
+    const moveSelected = (from, to) => {
+      for (const opt of Array.from(from.selectedOptions)) {
+        opt.selected = false;
+        to.appendChild(opt);
+      }
+    };
+
+    addBtn.addEventListener('click', () => moveSelected(available, selected));
+    removeBtn.addEventListener('click', () => moveSelected(selected, available));
+
+    source.form.addEventListener('submit', () => {
+      for (const opt of source.options) opt.selected = false;
+      for (const opt of selected.options) {
+        const src = Array.from(source.options).find((x) => x.value === opt.value);
+        if (src) src.selected = true;
+      }
+    });
+  })();
+</script>
 {% endblock %}

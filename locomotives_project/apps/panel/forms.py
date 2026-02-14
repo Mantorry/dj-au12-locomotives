@@ -84,6 +84,14 @@ class SSPSUnitForm(forms.ModelForm):
     def __init__(self,*a,**k): super().__init__(*a,**k); bootstrapify_form(self)
 
 class BrigadeForm(forms.ModelForm):
+    members = forms.ModelMultipleChoiceField(
+        label = 'Состав бригады',
+        queryset = User.objects.none(),
+        required = False,
+        widget = forms.SelectMultiple(attrs={"size":12}),
+        help_text = 'Добавляйте и убирайте пользователей кнопка между списками.',
+    )
+    
     class Meta:
         model = Brigade
         fields = ["name", "ssps_unit", "members", "is_active"]
@@ -93,13 +101,18 @@ class BrigadeForm(forms.ModelForm):
             "members": "Состав бригады",
             "is_active": "Активна",
         }
-        widgets = {"members": forms.SelectMultiple(attrs={"size": "12"})}
-
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # по умолчанию — все активные пользователи
-        self.fields["members"].queryset = User.objects.filter(is_active=True).order_by(
+        self.fields["members"].queryset = User.objects.all().order_by(
             "last_name", "first_name", "patronymic", "username"
         )
-        bootstrapify_form(self)
+        
+        def _members_label(user):
+          fio = " ".join(filter(None, [user.last_name, user.first_name, user.patronymic]))
+          base = fio or user.username
+          return base if user.is_active else f'{base} (неактивен)'
+        
+        self.fields["members"].label_from_instance = _members_label
+        bootstrapify_form

@@ -37,7 +37,14 @@ class RouteSheetAU12(models.Model):
     date = models.DateField("Дата")
 
     railway_name = models.CharField("Наименование дороги", max_length=255, blank=True)
-    enterprise_name = models.CharField("Предприятие", max_length=255, blank=True)
+    
+    enterprise = models.ForeignKey(
+        Enterprise,
+        verbose_name="Предприятие",
+        on_delete=models.PROTECT,
+        related_name="routesheets",
+        null=True,
+    )
 
     ssps_unit = models.ForeignKey(
         SSPSUnit,

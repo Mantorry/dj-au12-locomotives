@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 
-from apps.directory.models import MachineType, TransportUnit
+from apps.directory.models import Enterprise, MachineType, TransportUnit
 from .models import (
     RouteSheetAU12,
     AU12MedicalCheck,
@@ -37,18 +37,21 @@ def bootstrapify_formset(formset) -> None:
 class AU12CreateForm(forms.ModelForm):
     class Meta:
         model = RouteSheetAU12
-        fields = ["number", "date", "railway_name", "enterprise_name", "ssps_unit", "brigade"]
+        fields = ["number", "date", "railway_name", "enterprise", "ssps_unit", "brigade"]
         labels = {
             "number": "Номер",
             "date": "Дата",
             "railway_name": "Наименование дороги",
-            "enterprise_name": "Предприятие",
+            "enterprise": "Предприятие",
             "ssps_unit": "Единица ССПС",
             "brigade": "Бригада",
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.fields['enterprise'].queryset = Enterprise.objects.order_by("name")
+        self.fields['enterprise'].empty_laber = '-- выберите предприятие --'
 
         if "brigade" in self.fields:
             self.fields["brigade"].queryset = (

@@ -314,3 +314,23 @@ class BrigadeDelete(RoleRequiredMixin, DeleteView):
         ctx = super().get_context_data(**kwargs)
         ctx["title"]="Удалить бригаду"; ctx["back_url"]=reverse_lazy("panel:brigade_list")
         return ctx
+      
+class RouteSheetList(RoleRequiredMixin, ListView):
+    allowed_roles = {Role.ADMIN}
+    model = RouteSheetAU12
+    template_name = "panel/list_routesheets.html"
+    
+    def get_queryset(self):
+        return super().get_queryset().select_related("ssps_unit", "brigade", "created_by").order_by("-date", "-id")
+      
+class RouteSheetDelete(RoleRequiredMixin, DeleteView):
+    allowed_roles = {Role.ADMIN}
+    model = RouteSheetAU12
+    template_name = "panel/delete.html"
+    success_url = reverse_lazy("panel:routesheet_list")
+    
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["title"] = "Удалить маршрутный лист"
+        ctx["back_url"] = reverse_lazy("panel:routesheet_list")
+        return ctx

@@ -38,4 +38,7 @@ urlpatterns = [
     path("directory/brigades/create/", views.BrigadeCreate.as_view(), name="brigade_create"),
     path("directory/brigades/<int:pk>/edit/", views.BrigadeEdit.as_view(), name="brigade_edit"),
     path("directory/brigades/<int:pk>/delete/", views.BrigadeDelete.as_view(), name="brigade_delete"),
+    
+    path("routesheets/", views.RouteSheetList.as_view(), name='routesheet_list'),
+    path("routesheets/<int:pk>/delete/", views.RouteSheetDelete.as_view(), name='routesheet_delete'),
 ]

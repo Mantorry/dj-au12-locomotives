@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+  <div>
+    <h3 class="section-title mb-1">Маршрутные листы</h3>
+    <div class="text-muted">Управление маршрутными листами АУ-12</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-ghost" href="{% url 'routesheets:au12_list' %}">Открыть журнал</a>
+    <a class="btn btn-ghost" href="{% url 'panel:home' %}">Панель</a>
+  </div>
+</div>
+
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table table-sm align-middle mb-0">
+      <thead>
+        <tr>
+          <th>№ / дата</th>
+          <th>ССПС</th>
+          <th>Бригада</th>
+          <th>Статус</th>
+          <th>Создал</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for obj in object_list %}
+        <tr>
+          <td class="fw-semibold">{{ obj.number }} от {{ obj.date|date:"d.m.Y" }}</td>
+          <td>{{ obj.ssps_unit }}</td>
+          <td>{{ obj.brigade|default:"—" }}</td>
+          <td>{{ obj.get_status_display }}</td>
+          <td>{{ obj.created_by }}</td>
+          <td class="text-end">
+            <a class="btn btn-ghost btn-sm" href="{% url 'routesheets:au12_detail' obj.id %}">Открыть</a>
+            <a class="btn btn-ghost btn-sm" href="{% url 'panel:routesheet_delete' obj.id %}">Удалить</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="text-muted">Нет данных</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
