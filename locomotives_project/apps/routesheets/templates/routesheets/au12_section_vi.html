@@ -2,7 +2,7 @@
 {% block content %}
 <div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
   <div>
-    <h3 class="section-title mb-1">Раздел VI</h3>
+    <h3 class="section-title mb-1">Раздел VI — Замечания машиниста-инструктора/ревизора</h3>
     <div class="text-muted">АУ-12 №{{ rs.number }} от {{ rs.date }}</div>
   </div>
   <a class="btn btn-ghost" href="{% url 'routesheets:au12_detail' rs.id %}">Назад</a>
@@ -11,18 +11,33 @@
 <div class="card p-4">
   <form method="post">
     {% csrf_token %}
-    {% for field in form %}
-      <div class="mb-3">
-        <label class="form-label">{{ field.label }}</label>
-        {% if field.field.widget.input_type == "checkbox" %}
-          <div class="form-check">{{ field }} <label class="form-check-label">Да</label></div>
-        {% else %}
-          {{ field }}
-        {% endif %}
-        {% for e in field.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    <div class="mb-3">
+      <label class="form-label">Замечания</label>
+      {{ form.final_notes }}
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Проверил (ФИО)</label>
+        {{ form.inspector_name }}
       </div>
+      <div class="col-md-4">
+        <label class="form-label">Подпись</label>
+        {{ form.inspector_signature }}
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Время</label>
+        {{ form.sign_time }}
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <div class="form-check">{{ form.is_done }} <label class="form-check-label">Раздел заполнен</label></div>
+      </div>
+    </div>
+
+    {% for field in form %}
+      {% for e in field.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
     {% endfor %}
-    <button class="btn btn-brand" type="submit">Сохранить</button>
+    <button class="btn btn-brand mt-3" type="submit">Сохранить</button>
   </form>
 </div>
 {% endblock %}

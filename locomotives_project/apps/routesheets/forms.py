@@ -99,7 +99,6 @@ CrewFormSet = inlineformset_factory(
     RouteSheetAU12,
     AU12CrewRow,
     fields=[
-        "position_ref",
         "position_text",
         "full_name",
         "time_check_in",
@@ -148,6 +147,10 @@ class AU12SectionIIForm(forms.ModelForm):
         cleaned = super().clean()
         mt = cleaned.get("machine_type")
         tr = cleaned.get("transport")
+        if tr and not mt:
+          cleaned["machine_type"] = tr.machine_type
+          self.instance.machine_type = tr.machine_type
+          mt = tr.machine_type
         if mt and tr and tr.machine_type_id != mt.id:
             self.add_error("transport", "Номер машины не соответствует выбранному типу.")
         return cleaned
@@ -162,9 +165,7 @@ WorkFormSet = inlineformset_factory(
         "station_to",
         "time_departure",
         "time_arrival",
-        "work_type_ref",
         "work_name",
-        "work_place_ref",
         "work_place",
         "machine_work_start",
         "machine_work_end",

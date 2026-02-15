@@ -2,7 +2,7 @@
 {% block content %}
 <div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
   <div>
-    <h3 class="section-title mb-1">Раздел IV</h3>
+    <h3 class="section-title mb-1">Раздел IV — Результаты работы единицы ССПС и расход ТСМ</h3>
     <div class="text-muted">АУ-12 №{{ rs.number }} от {{ rs.date }}</div>
   </div>
   <a class="btn btn-ghost" href="{% url 'routesheets:au12_detail' rs.id %}">Назад</a>
@@ -11,18 +11,44 @@
 <div class="card p-4">
   <form method="post">
     {% csrf_token %}
-    {% for field in form %}
-      <div class="mb-3">
-        <label class="form-label">{{ field.label }}</label>
-        {% if field.field.widget.input_type == "checkbox" %}
-          <div class="form-check">{{ field }} <label class="form-check-label">Да</label></div>
-        {% else %}
-          {{ field }}
-        {% endif %}
-        {% for e in field.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <label class="form-label">Техническое состояние / замечания</label>
+        {{ form.technical_state }}
       </div>
+      <div class="col-md-4">
+        <label class="form-label">Выявленные неисправности</label>
+        {{ form.defects_found }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Принятые меры</label>
+        {{ form.measures_taken }}
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Ответственный (ФИО)</label>
+        {{ form.responsible_name }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Подпись ответственного</label>
+        {{ form.responsible_signature }}
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Время отметки</label>
+        {{ form.sign_time }}
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <div class="form-check">{{ form.is_done }} <label class="form-check-label">Раздел заполнен</label></div>
+      </div>
+    </div>
+
+    {% for field in form %}
+      {% for e in field.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
     {% endfor %}
-    <button class="btn btn-brand" type="submit">Сохранить</button>
+    <button class="btn btn-brand mt-3" type="submit">Сохранить</button>
   </form>
 </div>
 {% endblock %}

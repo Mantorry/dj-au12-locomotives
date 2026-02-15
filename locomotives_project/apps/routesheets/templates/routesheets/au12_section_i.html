@@ -17,8 +17,7 @@
       <table class="table table-sm align-middle">
         <thead>
           <tr>
-            <th>Должность (выбор)</th>
-            <th>Должность (вручную)</th>
+            <th>Должность</th>
             <th>ФИО</th>
             <th>Явка</th>
             <th>Оконч.</th>
@@ -30,7 +29,7 @@
         <tbody>
         {% for f in formset.forms %}
           <tr>
-            <td>{{ f.position_ref }}</td>
+						{% for hidden in f.hidden_fields %} {{hidden}} {% endfor %}
             <td>{{ f.position_text }}</td>
             <td>{{ f.full_name }}</td>
             <td>{{ f.time_check_in }}</td>
@@ -40,7 +39,7 @@
             <td>{% if f.instance.pk %}{{ f.DELETE }}{% endif %}</td>
           </tr>
           {% if f.non_field_errors %}
-            <tr><td colspan="8" class="text-danger small">{{ f.non_field_errors }}</td></tr>
+            <tr><td colspan="7" class="text-danger small">{{ f.non_field_errors }}</td></tr>
           {% endif %}
         {% endfor %}
         </tbody>

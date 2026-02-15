@@ -176,6 +176,7 @@ def au12_section_ii(request, pk: int):
     rs = get_object_or_404(RouteSheetAU12, pk=pk)
     _require_access(request, rs, AU12Step.CREW_WORK)
 
+    prefill_section_ii_from_previous(rs)
     obj, _ = AU12SectionII.objects.get_or_create(routesheet=rs)
 
     if request.method == "POST":

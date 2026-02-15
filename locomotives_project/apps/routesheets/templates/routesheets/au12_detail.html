@@ -20,7 +20,7 @@
 
     <div class="row g-2 mb-3">
       <div class="col-md-3"><span class="text-muted">Дорога:</span> {{ object.railway_name|default:"—" }}</div>
-      <div class="col-md-3"><span class="text-muted">Предприятие:</span> {{ object.enterprise_name|default:"—" }}</div>
+      <div class="col-md-3"><span class="text-muted">Предприятие:</span> {% if object.enterprise %}{{ object.enterprise.name }} {% else  %} - {% endif %}</div>
       <div class="col-md-3"><span class="text-muted">ССПС:</span> {{ object.ssps_unit }}</div>
       <div class="col-md-3"><span class="text-muted">Бригада:</span> {% if object.brigade %}{{ object.brigade.name }}{% else %}—{% endif %}</div>
     </div>
@@ -53,10 +53,9 @@
     <div class="fw-semibold mb-2">Раздел II. Пробег и ТСМ</div>
     {% if object.section_ii %}
       <div class="row g-2 mb-2">
-        <div class="col-md-6"><span class="text-muted">Предприятие-владелец:</span> {{ object.section_ii.enterprise_owner_display|default:"—" }}</div>
-        <div class="col-md-4"><span class="text-muted">Тип машины:</span> {{ object.section_ii.machine_type_display|default:"—" }}</div>
-        <div class="col-md-2"><span class="text-muted">Номер:</span> {{ object.section_ii.machine_number|default:"—" }}</div>
-      </div>
+        <div class="col-md-6"><span class="text-muted">Предприятие-владелец:</span> {% if object.section_ii.transport and object.section_ii.transport.ssps_unit and object.section_ii.transport.ssps_unit.owner %}{{ object.section_ii.transport.ssps_unit.owner.name }}{% else %}—{% endif %}</div>
+        <div class="col-md-4"><span class="text-muted">Тип машины:</span> {% if object.section_ii.machine_type %}{{ object.section_ii.machine_type.name }}{% else %}—{% endif %}</div>
+        <div class="col-md-2"><span class="text-muted">Номер:</span> {% if object.section_ii.transport %}{{ object.section_ii.transport.number }}{% else %}—{% endif %}</div>      </div>
       <div class="row g-2 mb-2">
         <div class="col-md-6"><span class="text-muted">Спидометр:</span> {{ object.section_ii.speedometer_out_km }} / {{ object.section_ii.speedometer_in_km }}</div>
         <div class="col-md-6"><span class="text-muted">Моточасы:</span> {{ object.section_ii.moto_hours_out }} / {{ object.section_ii.moto_hours_in }}</div>
@@ -87,8 +86,8 @@
             <td>{% if w.station_to %}{{ w.station_to }}{% endif %}</td>
             <td>{% if w.time_departure %}{{ w.time_departure }}{% endif %}</td>
             <td>{% if w.time_arrival %}{{ w.time_arrival }}{% endif %}</td>
-            <td>{{ w.work_display }}</td>
-            <td>{{ w.work_place_display }}</td>
+            <td>{{ w.work_name|default:"—" }}</td>
+            <td>{{ w.work_place|default:"—" }}</td>
           </tr>
         {% empty %}
           <tr><td colspan="7" class="text-muted">Нет данных</td></tr>
@@ -100,21 +99,38 @@
     <div class="fw-semibold mb-2">Раздел IV–VI</div>
     <div class="row g-2 mb-3">
       <div class="col-md-4">
-        <div class="border rounded-3 p-2">
-          <div class="text-muted">Раздел IV</div>
-          <div>{% if object.section_iv and object.section_iv.is_done %}Заполнен{% else %}—{% endif %}</div>
+        <div class="border rounded-3 p-2 h-100">
+          <div class="text-muted">Раздел IV — результаты работы и расход ТСМ</div>
+          {% if object.section_iv %}
+            <div class="small">Состояние: {{ object.section_iv.technical_state|default:"—" }}</div>
+            <div class="small">Неисправности: {{ object.section_iv.defects_found|default:"—" }}</div>
+            <div class="small">Меры: {{ object.section_iv.measures_taken|default:"—" }}</div>
+          {% else %}
+            <div>—</div>
+          {% endif %}
         </div>
       </div>
       <div class="col-md-4">
-        <div class="border rounded-3 p-2">
-          <div class="text-muted">Раздел V</div>
-          <div>{% if object.section_v and object.section_v.is_done %}Заполнен{% else %}—{% endif %}</div>
+        <div class="border rounded-3 p-2 h-100">
+          <div class="text-muted">Раздел V — тех. состояние и допуски</div>
+          {% if object.section_v %}
+            <div class="small">Допуски/примечания: {{ object.section_v.fuel_notes|default:"—" }}</div>
+            <div class="small">Связь/устройства: {{ object.section_v.repairs_notes|default:"—" }}</div>
+            <div class="small">Ответственный: {{ object.section_v.master_name|default:"—" }}</div>
+          {% else %}
+            <div>—</div>
+          {% endif %}
         </div>
       </div>
       <div class="col-md-4">
-        <div class="border rounded-3 p-2">
-          <div class="text-muted">Раздел VI</div>
-          <div>{% if object.section_vi and object.section_vi.is_done %}Заполнен{% else %}—{% endif %}</div>
+        <div class="border rounded-3 p-2 h-100">
+          <div class="text-muted">Раздел VI — замечания</div>
+          {% if object.section_vi %}
+            <div class="small">{{ object.section_vi.final_notes|default:"—" }}</div>
+            <div class="small">Проверил: {{ object.section_vi.inspector_name|default:"—" }}</div>
+          {% else %}
+            <div>—</div>
+          {% endif %}
         </div>
       </div>
     </div>
