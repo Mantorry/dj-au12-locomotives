@@ -32,7 +32,20 @@
     </div>
   </form>
 </div>
-
+<div class="row g-3 mb-3">
+  <div class="col-lg-8">
+    <div class="card p-3 h-100">
+      <div class="fw-semibold mb-2">Динамика по листам</div>
+      <canvas id="chartDaily" height="120"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card p-3 h-100">
+      <div class="fw-semibold mb-2">Итоги по ССПС</div>
+      <canvas id="chartSsps" height="120"></canvas>
+    </div>
+  </div>
+</div>
 <div class="card p-3">
   <div class="table-responsive">
     <table class="table table-sm align-middle mb-0">
@@ -63,4 +76,132 @@
     </table>
   </div>
 </div>
+{{ chart_daily|json_script:"chart-daily-data" }}
+{{ chart_ssps|json_script:"chart-ssps-data" }}
+<script>
+  (function () {
+    const daily = JSON.parse(document.getElementById('chart-daily-data').textContent || '{}');
+    const ssps = JSON.parse(document.getElementById('chart-ssps-data').textContent || '{}');
+
+    function drawLineChart(canvas, labels, series) {
+      if (!canvas || !labels.length || !series.length) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = Math.max(320, canvas.clientWidth || 0);
+      const h = canvas.height = Math.max(280, canvas.clientHeight || 280);
+      ctx.clearRect(0, 0, w, h);
+
+      const pad = { l: 42, r: 16, t: 12, b: 34 };
+      const plotW = w - pad.l - pad.r;
+      const plotH = h - pad.t - pad.b;
+
+      const allValues = series.flatMap(s => s.values);
+      const maxVal = Math.max(...allValues, 1);
+
+      ctx.strokeStyle = '#dee2e6';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = pad.t + (plotH / 4) * i;
+        ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+      }
+
+      series.forEach(s => {
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        s.values.forEach((val, i) => {
+          const x = pad.l + (labels.length === 1 ? plotW / 2 : (plotW / (labels.length - 1)) * i);
+          const y = pad.t + plotH - (val / maxVal) * plotH;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      });
+
+      ctx.fillStyle = '#6c757d';
+      ctx.font = '12px sans-serif';
+      const tickIdx = [0, Math.floor((labels.length - 1) / 2), labels.length - 1].filter((v, i, a) => a.indexOf(v) === i);
+      tickIdx.forEach(i => {
+        const x = pad.l + (labels.length === 1 ? plotW / 2 : (plotW / (labels.length - 1)) * i);
+        const text = labels[i] || '';
+        ctx.fillText(text, Math.max(0, x - 24), h - 10);
+      });
+
+      let legendX = pad.l;
+      series.forEach(s => {
+        ctx.fillStyle = s.color;
+        ctx.fillRect(legendX, 2, 10, 10);
+        ctx.fillStyle = '#212529';
+        ctx.fillText(s.label, legendX + 14, 11);
+        legendX += 110;
+      });
+    }
+
+    function drawBarChart(canvas, labels, fuelValues, kmValues) {
+      if (!canvas || !labels.length) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.clientWidth;
+      const h = canvas.height = Math.max(280, canvas.clientHeight || 280);
+      ctx.clearRect(0, 0, w, h);
+
+      const pad = { l: 42, r: 16, t: 12, b: 50 };
+      const plotW = w - pad.l - pad.r;
+      const plotH = h - pad.t - pad.b;
+
+      const maxVal = Math.max(...fuelValues, ...kmValues, 1);
+      const groupW = plotW / labels.length;
+      const barW = Math.min(24, groupW * 0.3);
+
+      ctx.strokeStyle = '#dee2e6';
+      for (let i = 0; i <= 4; i++) {
+        const y = pad.t + (plotH / 4) * i;
+        ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+      }
+
+      labels.forEach((label, i) => {
+        const baseX = pad.l + groupW * i + groupW / 2;
+
+        const fuelH = (fuelValues[i] / maxVal) * plotH;
+        ctx.fillStyle = 'rgba(220,53,69,.7)';
+        ctx.fillRect(baseX - barW - 2, pad.t + plotH - fuelH, barW, fuelH);
+
+        const kmH = (kmValues[i] / maxVal) * plotH;
+        ctx.fillStyle = 'rgba(13,110,253,.7)';
+        ctx.fillRect(baseX + 2, pad.t + plotH - kmH, barW, kmH);
+
+        ctx.fillStyle = '#6c757d';
+        ctx.font = '11px sans-serif';
+        const shortLabel = label.length > 10 ? label.slice(0, 10) + '…' : label;
+        ctx.fillText(shortLabel, Math.max(0, baseX - 28), h - 10);
+      });
+
+      ctx.fillStyle = 'rgba(220,53,69,.7)';
+      ctx.fillRect(pad.l, 2, 10, 10);
+      ctx.fillStyle = '#212529';
+      ctx.fillText('Расход (л)', pad.l + 14, 11);
+      ctx.fillStyle = 'rgba(13,110,253,.7)';
+      ctx.fillRect(pad.l + 110, 2, 10, 10);
+      ctx.fillStyle = '#212529';
+      ctx.fillText('Пробег (км)', pad.l + 124, 11);
+    }
+    console.log('daily', daily);
+    console.log('ssps', ssps);
+
+    drawLineChart(
+
+      document.getElementById('chartDaily'),
+      daily.labels || [],
+      [
+        { label: 'Расход (л)', values: daily.fuel || [], color: '#dc3545' },
+        { label: 'Пробег (км)', values: daily.km || [], color: '#0d6efd' },
+        { label: 'л/100км', values: daily.l100 || [], color: '#198754' },
+      ],
+    );
+
+    drawBarChart(
+      document.getElementById('chartSsps'),
+      ssps.labels || [],
+      ssps.fuel || [],
+      ssps.km || [],
+    );
+  })();
+</script>
 {% endblock %}

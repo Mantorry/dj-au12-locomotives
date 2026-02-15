@@ -38,6 +38,8 @@ from .services.export_excel import export_au12_excel
 from .services.analytics import run_km, fuel_consumed_l, consumption_l_per_100km
 from apps.directory.models import SSPSUnit
 
+import json
+
 
 User = get_user_model()
 
@@ -332,7 +334,6 @@ def au12_export_excel(request, pk: int):
 
 
 def analytics_fuel(request):
-    # доступ: мастер/админ/инспектор
     if not request.user.is_authenticated:
         raise Http404()
     if not (request.user.is_superuser or request.user.role in {Role.ADMIN, Role.MASTER, Role.INSPECTOR}):
@@ -354,12 +355,46 @@ def analytics_fuel(request):
     for rs in qs.order_by("-date", "-id")[:500]:
         km = run_km(rs)
         fuel = float(fuel_consumed_l(rs))
-        l100 = consumption_l_per_100km(rs)
-        rows.append({"date": rs.date, "number": rs.number, "ssps": str(rs.ssps_unit), "km": km, "fuel": fuel, "l_100": l100})
+        l100 = float(consumption_l_per_100km(rs))  # убедимся что число
+        rows.append({
+            "date": rs.date,
+            "number": rs.number,
+            "ssps": str(rs.ssps_unit),
+            "km": int(km),
+            "fuel": float(fuel),
+            "l_100": float(l100),
+        })
+
+    chart_rows = list(reversed(rows))
+    chart_daily = {
+        "labels": [r["date"].strftime("%Y-%m-%d") for r in chart_rows],
+        "fuel": [round(r["fuel"], 2) for r in chart_rows],
+        "km": [r["km"] for r in chart_rows],
+        "l100": [round(r["l_100"], 2) for r in chart_rows],
+    }
+
+    ssps_agg = {}
+    for r in rows:
+        item = ssps_agg.setdefault(r["ssps"], {"fuel": 0.0, "km": 0})
+        item["fuel"] += float(r["fuel"])
+        item["km"] += int(r["km"])
+
+    ssps_sorted = sorted(ssps_agg.items(), key=lambda x: x[1]["fuel"], reverse=True)
+    chart_ssps = {
+        "labels": [name for name, _ in ssps_sorted],
+        "fuel": [round(vals["fuel"], 2) for _, vals in ssps_sorted],
+        "km": [vals["km"] for _, vals in ssps_sorted],
+    }
 
     ssps_list = SSPSUnit.objects.order_by("type_name", "number")
     return render(
         request,
         "routesheets/analytics_fuel.html",
-        {"rows": rows, "filters": {"date_from": date_from, "date_to": date_to, "ssps": ssps}, "ssps_list": ssps_list},
+        {
+            "rows": rows,
+            "filters": {"date_from": date_from, "date_to": date_to, "ssps": ssps},
+            "ssps_list": ssps_list,
+            "chart_daily": chart_daily,   # <-- ВАЖНО: dict, не json string
+            "chart_ssps": chart_ssps,     # <-- ВАЖНО: dict, не json string
+        },
     )
