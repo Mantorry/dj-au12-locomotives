@@ -35,17 +35,17 @@
         {% for f in formset.forms %}
           <tr>
             {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
-            <td>{{ f.request_no }}</td>
-            <td>{{ f.station_from }}</td>
-            <td>{{ f.station_to }}</td>
-            <td>{{ f.time_departure }}</td>
-            <td>{{ f.time_arrival }}</td>
-            <td>{{ f.work_name }}</td>
-            <td>{{ f.machine_work_start }}</td>
-            <td>{{ f.machine_work_end }}</td>
-            <td>{{ f.work_volume }}</td>
-            <td>{{ f.supervisor_signature }}</td>
-            <td>{{ f.work_place }}</td>
+            <td>{{ f.request_no }}{% for e in f.request_no.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</td>
+            <td>{{ f.station_from }}{% for e in f.station_from.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</td>
+            <td>{{ f.station_to }}{% for e in f.station_to.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</td>
+            <td>{{ f.time_departure }}{% for e in f.time_departure.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</td>
+            <td>{{ f.time_arrival }}{% for e in f.time_arrival.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</td>
+            <td>{{ f.work_name }}{% for e in f.work_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</td>
+            <td>{{ f.work_place }}{% for e in f.work_place.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</td>
+            <td>{{ f.machine_work_start }}{% for e in f.machine_work_start.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</td>
+            <td>{{ f.machine_work_end }}{% for e in f.machine_work_end.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</td>
+            <td>{{ f.work_volume }}{% for e in f.work_volume.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</td>
+            <td>{{ f.supervisor_signature }}{% for e in f.supervisor_signature.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</td>
             <td>{% if f.instance.pk %}{{ f.DELETE }}{% endif %}</td>
           </tr>
           {% if f.non_field_errors %}

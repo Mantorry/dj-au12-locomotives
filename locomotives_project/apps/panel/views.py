@@ -1,6 +1,9 @@
 from django.views.generic import TemplateView, ListView, UpdateView, CreateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.db.models.deletion import ProtectedError
 
 from apps.accounts.permissions import RoleRequiredMixin
 from apps.accounts.models import Role
@@ -267,6 +270,19 @@ class SSPSUnitDelete(RoleRequiredMixin, DeleteView):
     model = SSPSUnit
     template_name = "panel/delete.html"
     success_url = reverse_lazy("panel:ssps_list")
+    
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            return super().post(request, *args, **kwargs)
+        except ProtectedError:
+            messages.error(
+                request,
+                "Невозможно удалить ССПС: к ней привязаны бригады или маршрутные листы. "
+                "Сначала удалите/переназначьте связанные записи.",
+            )
+            return redirect(self.success_url)
+    
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["title"]="Удалить ССПС"; ctx["back_url"]=reverse_lazy("panel:ssps_list")
